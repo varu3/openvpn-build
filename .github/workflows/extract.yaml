@@ -5,7 +5,13 @@ on:
     inputs:
       version:
         description: "OpenVPN version"
-        type: string
+        type: choice
+        required: true
+        options:
+          - 2.6.3
+          - 2.6.2
+          - 2.6.1
+          - 2.6.0
 
 permissions:
   id-token: write # This is required for requesting the JWT
