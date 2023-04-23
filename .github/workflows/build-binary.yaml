@@ -1,4 +1,4 @@
-name: Build OpenVPN binary for macOS(x86)
+name: build OpenVPN binary for macOS(x86)
 on:
   workflow_dispatch:
     inputs:
@@ -26,7 +26,7 @@ jobs:
       - name: Install openvpn
         run: |
           brew update
-          brew install openvpn@{{ inputs.version }}
+          brew install openvpn@${{ inputs.version }}
           brew upgrade
 
       - name: Check
