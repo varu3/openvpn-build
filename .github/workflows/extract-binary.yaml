@@ -1,0 +1,47 @@
+name: "extract OpenVPN binary for Windows"
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "OpenVPN version"
+        type: choice
+        required: true
+        options:
+          - 2.6.3
+          - 2.6.2
+          - 2.6.1
+          - 2.6.0
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    strategy:
+      matrix:
+        arch: [x86, amd64, arm64]
+    name: "[${{inputs.version}}][${{ matrix.arch }}] Extract binary files from msi file"
+    runs-on: windows-latest
+    steps:
+      - name: download msi file
+        run: |
+          New-Item -ItemType "directory" -Path ".\downloads"
+          Invoke-WebRequest -Uri "https://swupdate.openvpn.org/community/releases/OpenVPN-${{ inputs.version }}-I001-${{ matrix.arch }}.msi" -OutFile "./downloads/OpenVPN-${{ inputs.version }}-I001-${{ matrix.arch }}.msi"
+
+      - name: extract binary files
+        run: |
+          New-Item -ItemType "directory" -Path ".\OpenVPN"
+          msiexec.exe /a "D:\\a\openvpn-build\openvpn-build\downloads\OpenVPN-${{ inputs.version }}-I001-${{ matrix.arch }}.msi" /qb TARGETDIR="D:\\a\openvpn-build\openvpn-build"
+
+      - name: zip binary directory
+        run: |
+          New-Item -ItemType "directory" -Path ".\output"
+          Compress-Archive -Path "D:\\a\openvpn-build\openvpn-build\OpenVPN\bin" -DestinationPath "D:\\a\openvpn-build\openvpn-build\output\OpenVPN-${{ inputs.version }}-I001-${{ matrix.arch }}.zip"
+
+      - uses: ncipollo/release-action@v1
+        with:
+          name: "[${{ inputs.version }}] OpenVPN binaries"
+          allowUpdates: true
+          artifacts: "output/*"
+          body: "OpenVPN ${{ inputs.version }} binaries"
+          tag: ${{ inputs.version }}
