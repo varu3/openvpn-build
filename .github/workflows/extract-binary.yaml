@@ -36,7 +36,7 @@ jobs:
       - name: zip binary directory
         run: |
           New-Item -ItemType "directory" -Path ".\output"
-          Compress-Archive -Path "D:\\a\openvpn-build\openvpn-build\OpenVPN\bin" -DestinationPath "D:\\a\openvpn-build\openvpn-build\output\OpenVPN-${{ inputs.version }}-I001-${{ matrix.arch }}.zip"
+          Compress-Archive -Path "D:\\a\openvpn-build\openvpn-build\OpenVPN\bin" -DestinationPath "D:\\a\openvpn-build\openvpn-build\output\OpenVPN-${{ inputs.version }}-windows-${{ matrix.arch }}.zip"
 
       - uses: ncipollo/release-action@v1
         with:
