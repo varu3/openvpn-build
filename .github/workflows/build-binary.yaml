@@ -1,16 +1,6 @@
 name: build OpenVPN binary for macOS(x86)
 on:
   workflow_dispatch:
-    inputs:
-      version:
-        description: "OpenVPN version"
-        type: choice
-        required: true
-        options:
-          - 2.6.3
-          - 2.6.2
-          - 2.6.1
-          - 2.6.0
 
 permissions:
   id-token: write
@@ -26,8 +16,13 @@ jobs:
       - name: Install openvpn
         run: |
           brew update
-          brew install openvpn@${{ inputs.version }}
+          brew install openvpn
           brew upgrade
+
+      - name: version Check
+        run: |
+          openvpn --version
+          echo "OPENVPN_VERSION=$(openvpn --version | head -n 1 | awk '{print $2}')" >> $GITHUB_ENV
 
       - name: Check
         run: |
@@ -36,12 +31,12 @@ jobs:
       - name: zip binary directory
         run: |
           zip -r OpenVPN-${{ inputs.version }}-Darwin-${{ matrix.arch }}.zip" \
-            /usr/local/Cellar/openvpn@{{ inputs.version }}/sbin
+            /usr/local/Cellar/openvpn/${{ env.OPENVPN_VERSION }}/sbin
 
       - uses: ncipollo/release-action@v1
         with:
-          name: "[${{ inputs.version }}] OpenVPN binaries"
+          name: "[${{ env.OPENVPN_VERSION }}] OpenVPN binaries"
           allowUpdates: true
           artifacts: "OpenVPN-*.zip"
-          body: "OpenVPN ${{ inputs.version }} binaries"
-          tag: ${{ inputs.version }}
+          body: "OpenVPN ${{ env.OPENVPN_VERSION }} binaries"
+          tag: ${{ env.OPENVPN_VERSION }}
