@@ -30,7 +30,7 @@ jobs:
 
       - name: zip binary directory
         run: |
-          zip -r OpenVPN-${{ inputs.version }}-Darwin-${{ matrix.arch }}.zip" \
+          zip -r "OpenVPN-${{ env.OPENVPN_VERSION }}-Darwin-x86.zip" \
             /usr/local/Cellar/openvpn/${{ env.OPENVPN_VERSION }}/sbin
 
       - uses: ncipollo/release-action@v1
