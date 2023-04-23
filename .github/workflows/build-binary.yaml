@@ -1,0 +1,47 @@
+name: Build
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "OpenVPN version"
+        type: choice
+        required: true
+        options:
+          - 2.6.3
+          - 2.6.2
+          - 2.6.1
+          - 2.6.0
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  test1:
+    name: Install commands
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Install openvpn
+        run: |
+          brew update
+          brew install openvpn@{{ inputs.version }}
+          brew upgrade
+
+      - name: Check
+        run: |
+          brew list openvpn
+
+      - name: zip binary directory
+        run: |
+          zip -r OpenVPN-${{ inputs.version }}-Darwin-${{ matrix.arch }}.zip" \
+            /usr/local/Cellar/openvpn@{{ inputs.version }}/sbin
+
+      - uses: ncipollo/release-action@v1
+        with:
+          name: "[${{ inputs.version }}] OpenVPN binaries"
+          allowUpdates: true
+          artifacts: "OpenVPN-*.zip"
+          body: "OpenVPN ${{ inputs.version }} binaries"
+          tag: ${{ inputs.version }}
