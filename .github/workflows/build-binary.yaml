@@ -1,4 +1,4 @@
-name: Build
+name: Build OpenVPN binary for macOS(x86)
 on:
   workflow_dispatch:
     inputs:
